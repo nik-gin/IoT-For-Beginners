@@ -1,0 +1,132 @@
+diff --git a/2-farm/lessons/3-automated-plant-watering/README.md b/2-farm/lessons/3-automated-plant-watering/README.md
+--- a/2-farm/lessons/3-automated-plant-watering/README.md
++++ b/2-farm/lessons/3-automated-plant-watering/README.md
+@@ -300,3 +300,18 @@
++## Applied lab: R15-T042 — Moisture-control hysteresis
++
++This **fictional local teaching example** extends this lesson with [moisture-control hysteresis](applied-labs/r15-t042/README.md). Requires only Python 3 (standard library); no device, service, subscription or downloads.
++
++Run from the repository root:
++
++```sh
++python3 2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/example.py
++python3 -m unittest discover -s 2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042 -p "test_*.py"
++```
++
++Expected fixture/results: `[700,250,400,650]` starting off -> `off,on,on,off`; readings `300`/`600` retain state, invalid `1024` rejected.
++
++**Scope:** Does not control or test a real relay, pump or moisture sensor. The lab README explains boundaries, invalid cases and how to demonstrate a deliberately failing assertion.
++
+ ## Assignment
+ 
+ [Build a more efficient watering cycle](assignment.md)
+diff --git a/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/README.md b/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/README.md
+new file mode 100644
+--- /dev/null
++++ b/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/README.md
+@@ -0,0 +1,16 @@
++# R15-T042 — Moisture hysteresis boundary cases
++
++This self-contained **fictional** example complements the lesson's discussion of delayed sensor response and actuator timing. It uses no sensor, pump, relay, MQTT broker or cloud service.
++
++From the repository root:
++
++```sh
++python3 2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/example.py
++python3 -m unittest discover -s 2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042 -p "test_*.py"
++```
++
++With the pump initially off, readings `[700,250,400,650]` yield `off,on,on,off`. Strict boundaries at `300` and `600` retain the previous state. The smallest and largest allowed readings are `0` and `1023`; other values, booleans and non-integers are rejected.
++
++The script prints `states=off,on,on,off`, `boundary: 300 with on -> on`, `boundary: 600 with off -> off`, and `invalid 1024 -> rejected: moisture must be an integer in 0..1023`.
++
++To verify a deliberately incorrect expected answer causes a failure, run `RUN_INTENTIONAL_FAILURE=1 python3 -m unittest discover -s 2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042 -p "test_*.py"`; this must exit nonzero. This example does not establish any real moisture calibration, timing, device reliability or safe pump operation.
+diff --git a/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/example.py b/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/example.py
+new file mode 100644
+--- /dev/null
++++ b/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/example.py
+@@ -0,0 +1,44 @@
++"""A deterministic, hardware-free irrigation hysteresis teaching example.
++
++This is NOT a relay driver, calibration procedure, or physical safety control.
++"""
++
++READINGS = (700, 250, 400, 650)
++
++
++def next_state(watering_on, moisture):
++    """Turn on below 300, off above 600; retain state at both thresholds."""
++    if type(watering_on) is not bool:
++        raise ValueError("watering_on must be a boolean")
++    if type(moisture) is not int or not 0 <= moisture <= 1023:
++        raise ValueError("moisture must be an integer in 0..1023")
++    if moisture < 300:
++        return True
++    if moisture > 600:
++        return False
++    return watering_on
++
++
++def simulate(readings, initial=False):
++    state = initial
++    states = []
++    for reading in readings:
++        state = next_state(state, reading)
++        states.append("on" if state else "off")
++    return states
++
++
++def main():
++    print("FICTIONAL soil readings; no physical pump or relay")
++    print("start=off readings=[700, 250, 400, 650]")
++    print("states=" + ",".join(simulate(READINGS)))
++    print("boundary: 300 with on -> " + ("on" if next_state(True, 300) else "off"))
++    print("boundary: 600 with off -> " + ("on" if next_state(False, 600) else "off"))
++    try:
++        next_state(False, 1024)
++    except ValueError as exc:
++        print("invalid 1024 -> rejected: " + str(exc))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/test_example.py b/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/test_example.py
+new file mode 100644
+--- /dev/null
++++ b/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/test_example.py
+@@ -0,0 +1,35 @@
++"""Tests for the hardware-free moisture hysteresis example."""
++import os
++import unittest
++from example import READINGS, next_state, simulate
++
++
++class HysteresisTests(unittest.TestCase):
++    def test_required_fixture(self):
++        self.assertEqual(simulate(READINGS), ["off", "on", "on", "off"])
++
++    def test_thresholds_retain_both_states(self):
++        for threshold in (300, 600):
++            self.assertTrue(next_state(True, threshold))
++            self.assertFalse(next_state(False, threshold))
++
++    def test_range_endpoints(self):
++        self.assertTrue(next_state(False, 0))
++        self.assertFalse(next_state(True, 1023))
++
++    def test_invalid_readings(self):
++        for value in (-1, 1024, 299.5, "250", True, None):
++            with self.subTest(value=value), self.assertRaises(ValueError):
++                next_state(False, value)
++
++    def test_invalid_initial_state(self):
++        with self.assertRaises(ValueError):
++            next_state("off", 400)
++
++    @unittest.skipUnless(os.getenv("RUN_INTENTIONAL_FAILURE") == "1", "negative test runs separately")
++    def test_deliberately_wrong_result_fails(self):
++        self.assertEqual(simulate(READINGS), ["on", "on", "on", "on"])
++
++
++if __name__ == "__main__":
++    unittest.main()

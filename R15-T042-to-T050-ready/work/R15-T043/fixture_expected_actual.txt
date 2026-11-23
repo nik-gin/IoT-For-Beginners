@@ -1,0 +1,10 @@
+TASK: R15-T043
+EXPECTED: `(15,75)` and boundary `(10,70)` -> `inside`; `(21,75)` -> `outside`; `(100,75)` -> rejected invalid latitude.
+ACTUAL CLI:
+FICTIONAL rectangle: latitude [10,20], longitude [70,80]; inclusive
+(15,75): expected=inside actual=inside
+(10,70): expected=inside actual=inside
+(21,75): expected=outside actual=outside
+(100,75): rejected: invalid latitude
+Not a spherical-distance model, GPS feed or Azure Maps query.
+

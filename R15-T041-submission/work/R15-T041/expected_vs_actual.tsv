@@ -1,0 +1,5 @@
+case	expected	actual	reason
+complete	PASS	PASS	four fields present; shared topic tag(s): authenticity
+missing asset	FAIL	FAIL	missing or blank fields: asset
+blank asset	FAIL	FAIL	missing or blank fields: asset
+mismatched topic	REVIEW	REVIEW	threat/control topic tags do not overlap; human review needed

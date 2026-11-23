@@ -1,0 +1,7 @@
+$ python3 -m unittest discover -s 1-getting-started/lessons/1-introduction-to-iot/applied-labs/r15-t044 -p test_*.py
+exit_code=0
+.s.....
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+OK (skipped=1)

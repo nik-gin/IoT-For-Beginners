@@ -1,0 +1,6 @@
+Local-only patch check:
+  git apply --check /mnt/data/R15-T041-submission/R15-T041.patch
+  Exit: 0 (against minimal lesson stub with the same existing heading)
+  git apply /mnt/data/R15-T041-submission/R15-T041.patch
+  Exit: 0
+This is NOT a check against the actual S-AI-Projects checkout; it was unavailable here.

@@ -1,0 +1,20 @@
+RUN_INTENTIONAL_FAILURE=1
+$ python3 -m unittest discover -s 4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049 -p test_*.py
+exit_code=1
+.F....
+======================================================================
+FAIL: test_deliberately_wrong_result_fails (test_example.EdgeSecurityRubricTests.test_deliberately_wrong_result_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/R15-remaining-tasks/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/test_example.py", line 37, in test_deliberately_wrong_result_fails
+    self.assertEqual(check_scenario(SCENARIOS["Altered edge model package"])[0], "FAIL")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'PASS' != 'FAIL'
+- PASS
++ FAIL
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+FAILED (failures=1)

@@ -1,0 +1,9 @@
+TASK: R15-T048
+EXPECTED: 4/8/16 input records -> accepted 2/4/8 and rejected 2/4/8; `acceptance_fraction=0.50` for each.
+ACTUAL CLI:
+FICTIONAL offline validation size comparison; no performance benchmark
+inputs=4 accepted=2 rejected=2 acceptance_fraction=0.50 correct=True
+inputs=8 accepted=4 rejected=4 acceptance_fraction=0.50 correct=True
+inputs=16 accepted=8 rejected=8 acceptance_fraction=0.50 correct=True
+Trade-off: more records require processing more inputs; correctness ratio unchanged.
+

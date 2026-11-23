@@ -1,0 +1,9 @@
+$ python3 4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/example.py
+exit_code=0
+FICTIONAL edge-fruit scenarios: STRUCTURE-ONLY, not correctness
+Altered edge model package: PASS
+Exposed fruit camera frame: PASS
+Offline classifier interruption: PASS
+missing_asset: FAIL (missing/blank: asset)
+next_valid_input: PASS (four fields supplied and matching author tag; human review still required)
+unrelated_control: REVIEW (threat/control topic tags differ; human review required)

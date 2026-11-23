@@ -1,0 +1,8 @@
+$ python3 3-transport/lessons/4-geofences/applied-labs/r15-t043/example.py
+exit_code=0
+FICTIONAL rectangle: latitude [10,20], longitude [70,80]; inclusive
+(15,75): expected=inside actual=inside
+(10,70): expected=inside actual=inside
+(21,75): expected=outside actual=outside
+(100,75): rejected: invalid latitude
+Not a spherical-distance model, GPS feed or Azure Maps query.

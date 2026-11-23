@@ -1,0 +1,17 @@
+RUN_INTENTIONAL_FAILURE=1
+$ python3 -m unittest discover -s 6-consumer/lessons/1-speech-recognition/applied-labs/r15-t045 -p test_*.py
+exit_code=1
+...F.....
+======================================================================
+FAIL: test_deliberately_wrong_result_fails (test_example.MessageContractTests.test_deliberately_wrong_result_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/R15-remaining-tasks/6-consumer/lessons/1-speech-recognition/applied-labs/r15-t045/test_example.py", line 35, in test_deliberately_wrong_result_fails
+    self.assertEqual(len(process(FIXTURE)["accepted"]), 3)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 3
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.001s
+
+FAILED (failures=1)

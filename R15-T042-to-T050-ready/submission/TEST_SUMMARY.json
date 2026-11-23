@@ -1,0 +1,83 @@
+[
+  {
+    "task": "R15-T042",
+    "issue": 43,
+    "normal_tests": 6,
+    "normal_exit": 0,
+    "intentionally_wrong_exit": 1,
+    "example_exit": 0,
+    "patch": "submission/R15-T042.patch"
+  },
+  {
+    "task": "R15-T043",
+    "issue": 44,
+    "normal_tests": 5,
+    "normal_exit": 0,
+    "intentionally_wrong_exit": 1,
+    "example_exit": 0,
+    "patch": "submission/R15-T043.patch"
+  },
+  {
+    "task": "R15-T044",
+    "issue": 45,
+    "normal_tests": 7,
+    "normal_exit": 0,
+    "intentionally_wrong_exit": 1,
+    "example_exit": 0,
+    "patch": "submission/R15-T044.patch"
+  },
+  {
+    "task": "R15-T045",
+    "issue": 46,
+    "normal_tests": 9,
+    "normal_exit": 0,
+    "intentionally_wrong_exit": 1,
+    "example_exit": 0,
+    "patch": "submission/R15-T045.patch"
+  },
+  {
+    "task": "R15-T046",
+    "issue": 47,
+    "normal_tests": 7,
+    "normal_exit": 0,
+    "intentionally_wrong_exit": 1,
+    "example_exit": 0,
+    "patch": "submission/R15-T046.patch"
+  },
+  {
+    "task": "R15-T047",
+    "issue": 48,
+    "normal_tests": 7,
+    "normal_exit": 0,
+    "intentionally_wrong_exit": 1,
+    "example_exit": 0,
+    "patch": "submission/R15-T047.patch"
+  },
+  {
+    "task": "R15-T048",
+    "issue": 49,
+    "normal_tests": 8,
+    "normal_exit": 0,
+    "intentionally_wrong_exit": 1,
+    "example_exit": 0,
+    "patch": "submission/R15-T048.patch"
+  },
+  {
+    "task": "R15-T049",
+    "issue": 50,
+    "normal_tests": 6,
+    "normal_exit": 0,
+    "intentionally_wrong_exit": 1,
+    "example_exit": 0,
+    "patch": "submission/R15-T049.patch"
+  },
+  {
+    "task": "R15-T050",
+    "issue": 51,
+    "normal_tests": 6,
+    "normal_exit": 0,
+    "intentionally_wrong_exit": 1,
+    "example_exit": 0,
+    "patch": "submission/R15-T050.patch"
+  }
+]

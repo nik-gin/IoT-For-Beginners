@@ -1,0 +1,214 @@
+diff --git a/6-consumer/lessons/3-spoken-feedback/README.md b/6-consumer/lessons/3-spoken-feedback/README.md
+--- a/6-consumer/lessons/3-spoken-feedback/README.md
++++ b/6-consumer/lessons/3-spoken-feedback/README.md
+@@ -25,2 +25,15 @@
+ 
++## Applied lab — fictional spoken-timer security scenarios
++
++Try the [R15-T041 security-scenario rubric](applied-labs/r15-t041/README.md), a **fictional, structure-only** example connected to spoken timer confirmation. It includes **Spoofed timer completion**, **Overheard timer feedback**, and **Changed timer duration**. Each has `asset`, `threat`, `control`, and `residual_risk` fields. All three fixture scenarios print `PASS`; a missing asset prints `FAIL`; an unrelated threat/control topic is flagged `REVIEW`, not rejected automatically. A human must judge whether each explanation and control is actually sound.
++
++From the repository root, using only Python 3's standard library:
++
++```sh
++python3 6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/example.py
++python3 -m unittest discover -s 6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041 -p "test_*.py"
++```
++
++This is not a real timer, audio system, hardware test, cloud call, or security validation.
++
+ ## Text to speech
+diff --git a/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/README.md b/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/README.md
+new file mode 100644
+--- /dev/null
++++ b/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/README.md
+@@ -0,0 +1,40 @@
++# R15-T041 — fictional security-scenario rubric
++
++This **local, fictional, runnable concept example** extends the lesson [Set a timer and provide spoken feedback](../../README.md). The lesson describes confirming a timer using spoken feedback and announcing when the timer finishes. These mock security scenarios ask what needs protection when a spoken message is trusted, overheard, or based on a changed timer duration.
++
++The example needs only Python 3 and its standard library. It does **not** start a timer, generate speech, use hardware, contact a cloud service, download models, or measure model performance.
++
++## Run from the repository root
++
++```sh
++python3 6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/example.py
++python3 -m unittest discover -s 6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041 -p "test_*.py"
++```
++
++The example prints the three **fictional** scenario names and results:
++
++```text
++FICTIONAL spoken-timer scenarios — STRUCTURE ONLY (not correctness)
++Spoofed timer completion: PASS — four fields present; shared topic tag(s): authenticity
++Overheard timer feedback: PASS — four fields present; shared topic tag(s): privacy
++Changed timer duration: PASS — four fields present; shared topic tag(s): integrity
++```
++
++Each named scenario has exactly four non-empty string fields:
++
++- `asset`: what needs protecting
++- `threat`: a fictional way the asset could be harmed
++- `control`: a proposed response to the threat
++- `residual_risk`: what could remain even with the control
++
++`check_scenario` reports `PASS` when all fields are non-empty and the **author-supplied** topic tags in `threat` and `control` overlap; `FAIL` when any required field is absent/blank; and `REVIEW` when the fields are present but those topic tags do not overlap. The three tags used in the fixtures are `[authenticity]`, `[privacy]`, and `[integrity]`. A missing tag is also sent for review, not automatically failed. These tags are only a transparent **structure heuristic**; the checker does **not** understand language, establish whether a control addresses a threat, or judge security correctness. Two unrelated descriptions can reuse the same tag and receive `PASS`. A **human reviewer must judge the actual explanation and control rationale**.
++
++## Negative test (deliberate failure)
++
++To prove an incorrect expected result causes a non-zero exit, run this from the repository root:
++
++```sh
++R15_T041_NEGATIVE_TEST=1 python3 -m unittest discover -s 6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041 -p "test_*.py"
++```
++
++One opt-in test deliberately asserts that a valid fixture is `FAIL`; its **expected result is one test failure and exit code 1**. Do not use this opt-in mode as a passing test run. The normal command skips this intentional failure and exercises the passing, missing-asset, blank-asset and mismatch cases. Evidence is saved locally under `work/R15-T041/` and should not be included in an upstream PR.
+diff --git a/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/example.py b/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/example.py
+new file mode 100644
+--- /dev/null
++++ b/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/example.py
+@@ -0,0 +1,82 @@
++"""Fictional spoken-timer security scenarios and a STRUCTURE-ONLY rubric.
++
++No audio, timer, device, cloud service, or model is used. Shared topic tags
++are author-supplied labels, NOT evidence that a control works. A human must
++review whether each proposed control actually addresses its threat.
++"""
++
++REQUIRED_FIELDS = ("asset", "threat", "control", "residual_risk")
++TOPIC_TAGS = ("authenticity", "privacy", "integrity")
++
++# Each named FICTIONAL fixture has exactly the four rubric fields.
++# The bracketed topics are simple, inspectable metadata for the checker.
++SCENARIOS = {
++    "Spoofed timer completion": {
++        "asset": "Trust in the timer's spoken completion announcement.",
++        "threat": "[authenticity] A fictional nearby speaker impersonates a timer-complete announcement.",
++        "control": "[authenticity] Announce completion only after a trusted local timer event.",
++        "residual_risk": "A wrong local timer event could still produce an incorrect announcement.",
++    },
++    "Overheard timer feedback": {
++        "asset": "Privacy of a fictional user's spoken timer label.",
++        "threat": "[privacy] A bystander overhears the spoken timer label in a shared room.",
++        "control": "[privacy] Offer a quiet-feedback option before speaking a sensitive label.",
++        "residual_risk": "A user could still choose spoken feedback in a shared space.",
++    },
++    "Changed timer duration": {
++        "asset": "Integrity of the duration used for a fictional spoken timer.",
++        "threat": "[integrity] The requested timer duration is altered before the timer starts.",
++        "control": "[integrity] Validate the duration and ask for confirmation before starting.",
++        "residual_risk": "A user could confirm the wrong duration or misunderstand the prompt.",
++    },
++}
++
++
++def _topic_tags(description):
++    """Find author-supplied tags; this is not semantic/security analysis."""
++    lower = description.lower()
++    return {topic for topic in TOPIC_TAGS if "[{}]".format(topic) in lower}
++
++
++def check_scenario(scenario):
++    """Return PASS/FAIL/REVIEW based on four fields and shared topic tags.
++
++    FAIL: a required field is absent, empty, or not a nonempty string.
++    REVIEW: fields exist, but the threat/control topic tags do not overlap.
++    PASS: fields exist and those author-supplied tags overlap.
++
++    PASS means only that structure is complete and tags agree; it does NOT
++    prove the descriptions are accurate, relevant, safe, or effective.
++    """
++    if not isinstance(scenario, dict):
++        return {"status": "FAIL", "reason": "scenario must be a dictionary"}
++
++    missing = [
++        field for field in REQUIRED_FIELDS
++        if not isinstance(scenario.get(field), str) or not scenario[field].strip()
++    ]
++    if missing:
++        return {"status": "FAIL", "reason": "missing or blank fields: " + ", ".join(missing)}
++
++    shared = _topic_tags(scenario["threat"]) & _topic_tags(scenario["control"])
++    if not shared:
++        return {
++            "status": "REVIEW",
++            "reason": "threat/control topic tags do not overlap; human review needed",
++        }
++
++    return {
++        "status": "PASS",
++        "reason": "four fields present; shared topic tag(s): " + ", ".join(sorted(shared)),
++    }
++
++
++def main():
++    print("FICTIONAL spoken-timer scenarios — STRUCTURE ONLY (not correctness)")
++    for name, scenario in SCENARIOS.items():
++        result = check_scenario(scenario)
++        print("{}: {} — {}".format(name, result["status"], result["reason"]))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/test_example.py b/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/test_example.py
+new file mode 100644
+--- /dev/null
++++ b/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/test_example.py
+@@ -0,0 +1,58 @@
++"""Standard-library tests for the fictional, structure-only rubric."""
++
++import copy
++import os
++import unittest
++
++from example import SCENARIOS, check_scenario
++
++
++class ScenarioRubricTests(unittest.TestCase):
++    def test_exactly_three_fictional_scenarios_pass(self):
++        self.assertEqual(len(SCENARIOS), 3)
++        for name, scenario in SCENARIOS.items():
++            with self.subTest(name=name):
++                self.assertEqual(set(scenario), {"asset", "threat", "control", "residual_risk"})
++                self.assertEqual(check_scenario(scenario)["status"], "PASS")
++
++    def test_missing_asset_fails(self):
++        scenario = copy.deepcopy(SCENARIOS["Spoofed timer completion"])
++        del scenario["asset"]
++        result = check_scenario(scenario)
++        self.assertEqual(result["status"], "FAIL")
++        self.assertIn("asset", result["reason"])
++
++    def test_empty_asset_fails(self):
++        scenario = copy.deepcopy(SCENARIOS["Spoofed timer completion"])
++        scenario["asset"] = "   "
++        self.assertEqual(check_scenario(scenario)["status"], "FAIL")
++
++    def test_mismatched_threat_control_is_review_not_fail(self):
++        scenario = copy.deepcopy(SCENARIOS["Spoofed timer completion"])
++        scenario["control"] = "[privacy] Mute labels so bystanders cannot hear them."
++        result = check_scenario(scenario)
++        self.assertEqual(result["status"], "REVIEW")
++        self.assertIn("human review", result["reason"])
++
++    def test_untagged_control_is_review_not_fail(self):
++        scenario = copy.deepcopy(SCENARIOS["Changed timer duration"])
++        scenario["control"] = "Ask the user to confirm the time."
++        self.assertEqual(check_scenario(scenario)["status"], "REVIEW")
++
++    def test_a_wrong_expectation_is_detectable(self):
++        # unittest must reject the deliberately wrong expectation, even
++        # though the standard test suite itself should still pass.
++        actual = check_scenario(SCENARIOS["Spoofed timer completion"])["status"]
++        with self.assertRaises(AssertionError):
++            self.assertEqual(actual, "FAIL")  # Incorrect on purpose: actual is PASS.
++
++    @unittest.skipUnless(os.environ.get("R15_T041_NEGATIVE_TEST") == "1",
++                         "opt-in deliberate failure; run with R15_T041_NEGATIVE_TEST=1")
++    def test_opt_in_deliberately_wrong_expectation(self):
++        # Run with R15_T041_NEGATIVE_TEST=1: this MUST fail and exit nonzero.
++        actual = check_scenario(SCENARIOS["Spoofed timer completion"])["status"]
++        self.assertEqual(actual, "FAIL")  # Deliberately incorrect expectation.
++
++
++if __name__ == "__main__":
++    unittest.main()

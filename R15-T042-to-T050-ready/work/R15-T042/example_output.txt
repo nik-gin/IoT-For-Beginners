@@ -1,0 +1,8 @@
+$ python3 2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/example.py
+exit_code=0
+FICTIONAL soil readings; no physical pump or relay
+start=off readings=[700, 250, 400, 650]
+states=off,on,on,off
+boundary: 300 with on -> on
+boundary: 600 with off -> off
+invalid 1024 -> rejected: moisture must be an integer in 0..1023

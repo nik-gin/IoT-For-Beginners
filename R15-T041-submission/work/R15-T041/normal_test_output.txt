@@ -1,0 +1,10 @@
+$ python3 -m unittest discover -s 6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041 -p test_*.py
+cwd: /mnt/data/R15-T041-submission
+expected exit: 0
+actual exit: 0
+
+.....s.
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+OK (skipped=1)

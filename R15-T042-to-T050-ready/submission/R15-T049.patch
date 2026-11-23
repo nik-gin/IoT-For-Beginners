@@ -1,0 +1,162 @@
+diff --git a/4-manufacturing/lessons/3-run-fruit-detector-edge/README.md b/4-manufacturing/lessons/3-run-fruit-detector-edge/README.md
+--- a/4-manufacturing/lessons/3-run-fruit-detector-edge/README.md
++++ b/4-manufacturing/lessons/3-run-fruit-detector-edge/README.md
+@@ -611,3 +611,18 @@
++## Applied lab: R15-T049 — Edge security scenario recovery
++
++This **fictional local teaching example** extends this lesson with [edge security scenario recovery](applied-labs/r15-t049/README.md). Requires only Python 3 (standard library); no device, service, subscription or downloads.
++
++Run from the repository root:
++
++```sh
++python3 4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/example.py
++python3 -m unittest discover -s 4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049 -p "test_*.py"
++```
++
++Expected fixture/results: Three fictional complete scenarios -> `PASS`; missing asset -> `FAIL`; next complete input -> `PASS`; unrelated tags -> `REVIEW`.
++
++**Scope:** Structure-only checks; human judges security correctness. No model/device used. The lab README explains boundaries, invalid cases and how to demonstrate a deliberately failing assertion.
++
+ ## Assignment
+ 
+ [Run other services on the edge](assignment.md)
+diff --git a/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/README.md b/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/README.md
+new file mode 100644
+--- /dev/null
++++ b/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/README.md
+@@ -0,0 +1,18 @@
++# R15-T049 — Fictional edge-classifier security scenarios and recovery
++
++This **fictional**, entirely offline exercise illustrates why the [edge fruit detector lesson](../../README.md) must consider the integrity, privacy and availability of locally handled components. No fruit images, model artifacts, hardware, containers or network services are involved.
++
++All three scenarios use exactly four textual fields (`asset`, `threat`, `control`, `residual_risk`): **Altered edge model package**, **Exposed fruit camera frame**, **Offline classifier interruption**.
++
++Run from the repository root:
++
++```sh
++python3 4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/example.py
++python3 -m unittest discover -s 4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049 -p "test_*.py"
++```
++
++Expected statuses: the three complete fictional scenarios `PASS`; missing asset `FAIL`; the **next valid** scenario `PASS` (recovery); mismatched threat/control topic tags `REVIEW` (not automatically failed). Missing or whitespace-only fields are rejected, but processing subsequent valid inputs works without restarting the process.
++
++The rubric verifies **structure only**, plus a mechanical match of author-provided `[integrity]`, `[privacy]` or `[availability]` text tags. A `PASS` **does not mean** a proposed security control is correct, sufficient or effective; a human reviewer must assess its relevance and explanation. A `REVIEW` flag is not an automated correctness judgment.
++
++Run `RUN_INTENTIONAL_FAILURE=1 python3 -m unittest discover -s 4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049 -p "test_*.py"` to confirm an intentionally wrong expectation causes a nonzero exit. This example does not establish any real edge behavior, cloud performance, security assurance or ML classification quality.
+diff --git a/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/example.py b/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/example.py
+new file mode 100644
+--- /dev/null
++++ b/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/example.py
+@@ -0,0 +1,66 @@
++"""Fictional fruit-detector-edge threat scenarios: STRUCTURE-ONLY rubric.
++
++PASS only means nonblank fields and matching author-supplied topic tags.
++A human must assess whether controls mitigate threats; NO real edge inference occurs.
++"""
++
++FIELDS = ("asset", "threat", "control", "residual_risk")
++TAGS = ("integrity", "privacy", "availability")
++SCENARIOS = {
++    "Altered edge model package": {
++        "asset": "Integrity of a fictional fruit classifier package deployed at the edge.",
++        "threat": "[integrity] A modified model package could alter local classification results.",
++        "control": "[integrity] Verify an approved package checksum before using the package.",
++        "residual_risk": "An approved but faulty package might still make mistakes.",
++    },
++    "Exposed fruit camera frame": {
++        "asset": "Privacy of a fictional image captured near workers.",
++        "threat": "[privacy] A local operator may view sensitive frame contents.",
++        "control": "[privacy] Restrict access to locally stored frames.",
++        "residual_risk": "An authorized operator might still misuse an image.",
++    },
++    "Offline classifier interruption": {
++        "asset": "Availability of a fictional local fruit-sorter response.",
++        "threat": "[availability] A local edge process stops responding to requests.",
++        "control": "[availability] Send a clear unavailable status and require an operator check.",
++        "residual_risk": "Sorting can remain unavailable until manual intervention.",
++    },
++}
++
++
++def check_scenario(scenario):
++    """Check field structure + tag overlap ONLY, never explanation correctness."""
++    if not isinstance(scenario, dict):
++        return ("FAIL", "scenario must be an object")
++    missing = [name for name in FIELDS if not isinstance(scenario.get(name), str)
++               or not scenario[name].strip()]
++    if missing:
++        return ("FAIL", "missing/blank: " + ",".join(missing))
++    def tags(text):
++        return {name for name in TAGS if "[" + name + "]" in text.lower()}
++    if not (tags(scenario["threat"]) & tags(scenario["control"])):
++        return ("REVIEW", "threat/control topic tags differ; human review required")
++    return ("PASS", "four fields supplied and matching author tag; human review still required")
++
++
++def failure_and_recovery():
++    """One missing-data failure, then a fresh valid input accepted."""
++    invalid = dict(SCENARIOS["Altered edge model package"])
++    del invalid["asset"]
++    return check_scenario(invalid), check_scenario(SCENARIOS["Altered edge model package"])
++
++
++def main():
++    print("FICTIONAL edge-fruit scenarios: STRUCTURE-ONLY, not correctness")
++    for name, scenario in SCENARIOS.items():
++        print("{}: {}".format(name, check_scenario(scenario)[0]))
++    failed, recovered = failure_and_recovery()
++    print("missing_asset: {} ({})".format(*failed))
++    print("next_valid_input: {} ({})".format(*recovered))
++    unmatched = dict(SCENARIOS["Altered edge model package"])
++    unmatched["control"] = "[privacy] Hide image previews from visitors."
++    print("unrelated_control: {} ({})".format(*check_scenario(unmatched)))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/test_example.py b/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/test_example.py
+new file mode 100644
+--- /dev/null
++++ b/4-manufacturing/lessons/3-run-fruit-detector-edge/applied-labs/r15-t049/test_example.py
+@@ -0,0 +1,41 @@
++import os
++import unittest
++from example import SCENARIOS, check_scenario, failure_and_recovery
++
++
++class EdgeSecurityRubricTests(unittest.TestCase):
++    def test_all_three_complete_scenarios_pass_structure(self):
++        self.assertEqual(len(SCENARIOS), 3)
++        for name, scenario in SCENARIOS.items():
++            with self.subTest(scenario=name):
++                self.assertEqual(check_scenario(scenario)[0], "PASS")
++
++    def test_missing_asset_is_failure(self):
++        scenario = dict(SCENARIOS["Altered edge model package"])
++        del scenario["asset"]
++        self.assertEqual(check_scenario(scenario)[0], "FAIL")
++
++    def test_unrelated_control_flagged_not_failed(self):
++        scenario = dict(SCENARIOS["Altered edge model package"])
++        scenario["control"] = "[privacy] Hide a screen from passersby."
++        self.assertEqual(check_scenario(scenario)[0], "REVIEW")
++
++    def test_missing_and_blank_fields(self):
++        for key in ("asset", "threat", "control", "residual_risk"):
++            item = dict(SCENARIOS["Offline classifier interruption"])
++            item[key] = "  "
++            with self.subTest(key=key):
++                self.assertEqual(check_scenario(item)[0], "FAIL")
++        self.assertEqual(check_scenario(None)[0], "FAIL")
++
++    def test_failure_is_followed_by_valid_recovery(self):
++        invalid, recovered = failure_and_recovery()
++        self.assertEqual([invalid[0], recovered[0]], ["FAIL", "PASS"])
++
++    @unittest.skipUnless(os.getenv("RUN_INTENTIONAL_FAILURE") == "1", "negative test runs separately")
++    def test_deliberately_wrong_result_fails(self):
++        self.assertEqual(check_scenario(SCENARIOS["Altered edge model package"])[0], "FAIL")
++
++
++if __name__ == "__main__":
++    unittest.main()

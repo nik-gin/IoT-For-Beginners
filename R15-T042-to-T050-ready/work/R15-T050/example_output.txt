@@ -1,0 +1,10 @@
+$ python3 3-transport/lessons/1-location-tracking/applied-labs/r15-t050/example.py
+exit_code=0
+FICTIONAL local (latitude,longitude) geofence; inclusive rectangle
+(15,75): inside
+(10,70): inside
+(21,75): outside
+predict: inside
+diagnose: rejected: invalid latitude
+boundary_policy: inside
+Not a spherical-distance model or live GPS observation.

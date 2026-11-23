@@ -1,0 +1,8 @@
+$ python3 4-manufacturing/lessons/2-check-fruit-from-device/applied-labs/r15-t047/example.py
+exit_code=0
+FICTIONAL fruit-device message records (not image classification)
+0: accept A@2
+1: accept A@1
+2: reject duplicate_device_timestamp
+3: reject invalid_reading
+sorted accepted=[A@1,A@2] rejected=[2:duplicate_device_timestamp,3:invalid_reading]

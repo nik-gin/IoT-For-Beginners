@@ -1,0 +1,147 @@
+diff --git a/3-transport/lessons/1-location-tracking/README.md b/3-transport/lessons/1-location-tracking/README.md
+--- a/3-transport/lessons/1-location-tracking/README.md
++++ b/3-transport/lessons/1-location-tracking/README.md
+@@ -202,3 +202,18 @@
++## Applied lab: R15-T050 — Geofence applied assessment
++
++This **fictional local teaching example** extends this lesson with [geofence applied assessment](applied-labs/r15-t050/README.md). Requires only Python 3 (standard library); no device, service, subscription or downloads.
++
++Run from the repository root:
++
++```sh
++python3 3-transport/lessons/1-location-tracking/applied-labs/r15-t050/example.py
++python3 -m unittest discover -s 3-transport/lessons/1-location-tracking/applied-labs/r15-t050 -p "test_*.py"
++```
++
++Expected fixture/results: `(15,75) -> inside`, `(10,70) -> inside`, `(21,75) -> outside`, invalid latitude `100` rejected.
++
++**Scope:** Inclusive rectangle only; not spherical distance or GPS observation. The lab README explains boundaries, invalid cases and how to demonstrate a deliberately failing assertion.
++
+ ## Assignment
+ 
+ [Investigate other GPS data](assignment.md)
+diff --git a/3-transport/lessons/1-location-tracking/applied-labs/r15-t050/README.md b/3-transport/lessons/1-location-tracking/applied-labs/r15-t050/README.md
+new file mode 100644
+--- /dev/null
++++ b/3-transport/lessons/1-location-tracking/applied-labs/r15-t050/README.md
+@@ -0,0 +1,22 @@
++# R15-T050 — Location geofence scenario assessment
++
++This **fictional, local** coordinate exercise extends the [location-tracking lesson](../../README.md) with three questions and executable checks. Input order is `(latitude, longitude)`. Latitude must be in `[-90,90]`, longitude in `[-180,180]`; non-finite or nonnumeric coordinates are rejected. The teaching rectangle is latitude `[10,20]` and longitude `[70,80]` with **inclusive** boundaries.
++
++From the repository root:
++
++```sh
++python3 3-transport/lessons/1-location-tracking/applied-labs/r15-t050/example.py
++python3 -m unittest discover -s 3-transport/lessons/1-location-tracking/applied-labs/r15-t050 -p "test_*.py"
++```
++
++Core fixtures: `(15,75) -> inside`, `(10,70) -> inside`, `(21,75) -> outside`, and `(100,75) -> rejected: invalid latitude`.
++
++### Three applied questions, answers, and executable checks
++
++1. **Predict an output:** Is `(15,75)` inside? **Yes, `inside`**, because both values lie within the specified ranges. `test_question_one_predict` asserts the computed output.
++2. **Diagnose a failure:** Why is `(100,75)` rejected? **Invalid latitude**, because 100 is outside the valid global latitude range of -90 to 90. `test_question_two_diagnose_invalid_latitude` checks the raised error and the readable diagnosis.
++3. **Choose a boundary policy:** Should `(10,70)` count? **Yes, `inside`** under the explicitly inclusive policy; with exclusive bounds it would be `outside`. `test_question_three_inclusive_boundary_policy` compares both policies and all four corners.
++
++The script prints the fixture results plus `predict: inside`, `diagnose: rejected: invalid latitude`, and `boundary_policy: inside`. Run `RUN_INTENTIONAL_FAILURE=1 python3 -m unittest discover -s 3-transport/lessons/1-location-tracking/applied-labs/r15-t050 -p "test_*.py"` to demonstrate a deliberately wrong expected result exits nonzero.
++
++The rectangle is **not a spherical-distance model**, an accurate polygon geofence, a route or a GPS observation. It does not test physical GPS accuracy, NMEA parsing, or cloud functionality.
+diff --git a/3-transport/lessons/1-location-tracking/applied-labs/r15-t050/example.py b/3-transport/lessons/1-location-tracking/applied-labs/r15-t050/example.py
+new file mode 100644
+--- /dev/null
++++ b/3-transport/lessons/1-location-tracking/applied-labs/r15-t050/example.py
+@@ -0,0 +1,49 @@
++"""Fictional GPS records classified with an inclusive rectangular geofence.
++
++This is not a spherical-distance, polygon, GPS-hardware or network model.
++"""
++import math
++
++RECTANGLE = {"lat_min": 10, "lat_max": 20, "lon_min": 70, "lon_max": 80}
++POINTS = ((15, 75), (10, 70), (21, 75))
++
++
++def classify(latitude, longitude, inclusive=True):
++    """Validate lat/lon order; classify within the teaching rectangle."""
++    for name, value, low, high in (("latitude", latitude, -90, 90),
++                                   ("longitude", longitude, -180, 180)):
++        if type(value) not in (int, float) or not math.isfinite(value) or not low <= value <= high:
++            raise ValueError("invalid " + name)
++    if type(inclusive) is not bool:
++        raise ValueError("inclusive must be boolean")
++    if inclusive:
++        inside = (10 <= latitude <= 20 and 70 <= longitude <= 80)
++    else:
++        inside = (10 < latitude < 20 and 70 < longitude < 80)
++    return "inside" if inside else "outside"
++
++
++def answers():
++    """Executable answers to three applied questions in README.md."""
++    prediction = classify(15, 75)
++    try:
++        classify(100, 75)
++    except ValueError as exc:
++        diagnosis = "rejected: " + str(exc)
++    else:
++        diagnosis = "not rejected"
++    boundary = classify(10, 70, inclusive=True)
++    return {"predict": prediction, "diagnose": diagnosis, "boundary_policy": boundary}
++
++
++def main():
++    print("FICTIONAL local (latitude,longitude) geofence; inclusive rectangle")
++    for lat, lon in POINTS:
++        print("({},{}): {}".format(lat, lon, classify(lat, lon)))
++    for name, answer in answers().items():
++        print("{}: {}".format(name, answer))
++    print("Not a spherical-distance model or live GPS observation.")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/3-transport/lessons/1-location-tracking/applied-labs/r15-t050/test_example.py b/3-transport/lessons/1-location-tracking/applied-labs/r15-t050/test_example.py
+new file mode 100644
+--- /dev/null
++++ b/3-transport/lessons/1-location-tracking/applied-labs/r15-t050/test_example.py
+@@ -0,0 +1,39 @@
++import os
++import unittest
++from example import POINTS, answers, classify
++
++
++class ScenarioAssessmentTests(unittest.TestCase):
++    def test_core_fixtures(self):
++        self.assertEqual([classify(*p) for p in POINTS], ["inside", "inside", "outside"])
++
++    def test_question_one_predict(self):
++        self.assertEqual(answers()["predict"], "inside")
++        self.assertEqual(classify(15, 75), "inside")
++
++    def test_question_two_diagnose_invalid_latitude(self):
++        self.assertEqual(answers()["diagnose"], "rejected: invalid latitude")
++        with self.assertRaisesRegex(ValueError, "invalid latitude"):
++            classify(100, 75)
++
++    def test_question_three_inclusive_boundary_policy(self):
++        self.assertEqual(answers()["boundary_policy"], "inside")
++        self.assertEqual(classify(10, 70, inclusive=True), "inside")
++        self.assertEqual(classify(10, 70, inclusive=False), "outside")
++        for corner in ((10,70),(10,80),(20,70),(20,80)):
++            self.assertEqual(classify(*corner), "inside")
++
++    def test_invalid_coordinate_and_option(self):
++        for point in ((-91,70),(20,181),(float("inf"),70),("15",75),(True,70)):
++            with self.subTest(point=point), self.assertRaises(ValueError):
++                classify(*point)
++        with self.assertRaises(ValueError):
++            classify(15,75,inclusive="yes")
++
++    @unittest.skipUnless(os.getenv("RUN_INTENTIONAL_FAILURE") == "1", "negative test runs separately")
++    def test_deliberately_wrong_result_fails(self):
++        self.assertEqual(classify(10, 70), "outside")
++
++
++if __name__ == "__main__":
++    unittest.main()

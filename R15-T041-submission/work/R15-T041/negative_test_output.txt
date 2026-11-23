@@ -1,0 +1,29 @@
+$ R15_T041_NEGATIVE_TEST=1 python3 -m unittest discover -s 6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041 -p test_*.py -v
+cwd: /mnt/data/R15-T041-submission
+expected exit: 1
+actual exit: 1
+
+test_a_wrong_expectation_is_detectable (test_example.ScenarioRubricTests.test_a_wrong_expectation_is_detectable) ... ok
+test_empty_asset_fails (test_example.ScenarioRubricTests.test_empty_asset_fails) ... ok
+test_exactly_three_fictional_scenarios_pass (test_example.ScenarioRubricTests.test_exactly_three_fictional_scenarios_pass) ... ok
+test_mismatched_threat_control_is_review_not_fail (test_example.ScenarioRubricTests.test_mismatched_threat_control_is_review_not_fail) ... ok
+test_missing_asset_fails (test_example.ScenarioRubricTests.test_missing_asset_fails) ... ok
+test_opt_in_deliberately_wrong_expectation (test_example.ScenarioRubricTests.test_opt_in_deliberately_wrong_expectation) ... FAIL
+test_untagged_control_is_review_not_fail (test_example.ScenarioRubricTests.test_untagged_control_is_review_not_fail) ... ok
+
+======================================================================
+FAIL: test_opt_in_deliberately_wrong_expectation (test_example.ScenarioRubricTests.test_opt_in_deliberately_wrong_expectation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/R15-T041-submission/6-consumer/lessons/3-spoken-feedback/applied-labs/r15-t041/test_example.py", line 54, in test_opt_in_deliberately_wrong_expectation
+    self.assertEqual(actual, "FAIL")  # Deliberately incorrect expectation.
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 'PASS' != 'FAIL'
+- PASS
++ FAIL
+
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+FAILED (failures=1)

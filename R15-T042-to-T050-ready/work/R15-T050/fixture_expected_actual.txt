@@ -1,0 +1,12 @@
+TASK: R15-T050
+EXPECTED: `(15,75) -> inside`, `(10,70) -> inside`, `(21,75) -> outside`, invalid latitude `100` rejected.
+ACTUAL CLI:
+FICTIONAL local (latitude,longitude) geofence; inclusive rectangle
+(15,75): inside
+(10,70): inside
+(21,75): outside
+predict: inside
+diagnose: rejected: invalid latitude
+boundary_policy: inside
+Not a spherical-distance model or live GPS observation.
+

@@ -1,0 +1,117 @@
+diff --git a/3-transport/lessons/4-geofences/README.md b/3-transport/lessons/4-geofences/README.md
+--- a/3-transport/lessons/4-geofences/README.md
++++ b/3-transport/lessons/4-geofences/README.md
+@@ -473,3 +473,18 @@
++## Applied lab: R15-T043 — Geofence membership comparison
++
++This **fictional local teaching example** extends this lesson with [geofence membership comparison](applied-labs/r15-t043/README.md). Requires only Python 3 (standard library); no device, service, subscription or downloads.
++
++Run from the repository root:
++
++```sh
++python3 3-transport/lessons/4-geofences/applied-labs/r15-t043/example.py
++python3 -m unittest discover -s 3-transport/lessons/4-geofences/applied-labs/r15-t043 -p "test_*.py"
++```
++
++Expected fixture/results: `(15,75)` and boundary `(10,70)` -> `inside`; `(21,75)` -> `outside`; `(100,75)` -> rejected invalid latitude.
++
++**Scope:** Inclusive rectangle only, not spherical distance, polygon or live GPS. The lab README explains boundaries, invalid cases and how to demonstrate a deliberately failing assertion.
++
+ ## Assignment
+ 
+ [Send notifications using Twilio](assignment.md)
+diff --git a/3-transport/lessons/4-geofences/applied-labs/r15-t043/README.md b/3-transport/lessons/4-geofences/applied-labs/r15-t043/README.md
+new file mode 100644
+--- /dev/null
++++ b/3-transport/lessons/4-geofences/applied-labs/r15-t043/README.md
+@@ -0,0 +1,14 @@
++# R15-T043 — Geofence: direct check versus expected table
++
++This **fictional**, hardware-free rectangle demonstrates geofence membership in the [Geofences lesson](../../README.md). Coordinates are `(latitude, longitude)`; the rectangle includes the boundary: latitude `[10,20]`, longitude `[70,80]`.
++
++Run from repository root:
++
++```sh
++python3 3-transport/lessons/4-geofences/applied-labs/r15-t043/example.py
++python3 -m unittest discover -s 3-transport/lessons/4-geofences/applied-labs/r15-t043 -p "test_*.py"
++```
++
++A direct inclusive comparison is checked against an **independently authored expected table** with identical inputs: `(15,75) -> inside`, `(10,70) -> inside`, `(21,75) -> outside`. `(100,75)` is rejected as invalid latitude. All four rectangle corners count as inside. Run `RUN_INTENTIONAL_FAILURE=1 python3 -m unittest discover -s 3-transport/lessons/4-geofences/applied-labs/r15-t043 -p "test_*.py"` to see the intentionally wrong result make the test process exit nonzero.
++
++This is **not** spherical-distance, polygon geofencing, NMEA parsing, actual GPS data, or an Azure Maps result. No network call is made.
+diff --git a/3-transport/lessons/4-geofences/applied-labs/r15-t043/example.py b/3-transport/lessons/4-geofences/applied-labs/r15-t043/example.py
+new file mode 100644
+--- /dev/null
++++ b/3-transport/lessons/4-geofences/applied-labs/r15-t043/example.py
+@@ -0,0 +1,34 @@
++"""Inclusive rectangular geofence for local teaching data, not spherical distance."""
++import math
++
++# Input order is (latitude, longitude), not GeoJSON's (longitude, latitude).
++SAMPLES = ((15, 75, "inside"), (10, 70, "inside"), (21, 75, "outside"))
++
++
++def classify(latitude, longitude):
++    """Return inside/outside; reject impossible or non-finite coordinates."""
++    for name, value, low, high in (("latitude", latitude, -90, 90),
++                                   ("longitude", longitude, -180, 180)):
++        if type(value) not in (int, float) or not math.isfinite(value) or not low <= value <= high:
++            raise ValueError("invalid " + name)
++    return "inside" if 10 <= latitude <= 20 and 70 <= longitude <= 80 else "outside"
++
++
++def compare_expected():
++    """Independent, hand-authored expected-result table for the same inputs."""
++    return [(lat, lon, expected, classify(lat, lon)) for lat, lon, expected in SAMPLES]
++
++
++def main():
++    print("FICTIONAL rectangle: latitude [10,20], longitude [70,80]; inclusive")
++    for lat, lon, expected, actual in compare_expected():
++        print("({},{}): expected={} actual={}".format(lat, lon, expected, actual))
++    try:
++        classify(100, 75)
++    except ValueError as exc:
++        print("(100,75): rejected: " + str(exc))
++    print("Not a spherical-distance model, GPS feed or Azure Maps query.")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/3-transport/lessons/4-geofences/applied-labs/r15-t043/test_example.py b/3-transport/lessons/4-geofences/applied-labs/r15-t043/test_example.py
+new file mode 100644
+--- /dev/null
++++ b/3-transport/lessons/4-geofences/applied-labs/r15-t043/test_example.py
+@@ -0,0 +1,32 @@
++import os
++import unittest
++from example import SAMPLES, classify, compare_expected
++
++
++class GeofenceTests(unittest.TestCase):
++    def test_required_cases_and_independent_table(self):
++        self.assertEqual([(x[0], x[1], x[2]) for x in compare_expected()], list(SAMPLES))
++        for lat, lon, expected, actual in compare_expected():
++            with self.subTest(lat=lat, lon=lon):
++                self.assertEqual(actual, expected)
++
++    def test_inclusive_all_corners(self):
++        for point in ((10,70),(10,80),(20,70),(20,80)):
++            self.assertEqual(classify(*point), "inside")
++
++    def test_outside_cases(self):
++        self.assertEqual(classify(9.999,75), "outside")
++        self.assertEqual(classify(15,80.001), "outside")
++
++    def test_invalid_coordinates(self):
++        for args in ((100,75),(-91,75),(15,181),(float("nan"),75),(True,75),("15",75)):
++            with self.subTest(args=args), self.assertRaises(ValueError):
++                classify(*args)
++
++    @unittest.skipUnless(os.getenv("RUN_INTENTIONAL_FAILURE") == "1", "negative test runs separately")
++    def test_deliberately_wrong_result_fails(self):
++        self.assertEqual(classify(10,70), "outside")
++
++
++if __name__ == "__main__":
++    unittest.main()

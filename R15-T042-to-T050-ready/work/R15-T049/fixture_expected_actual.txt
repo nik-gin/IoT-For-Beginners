@@ -1,0 +1,11 @@
+TASK: R15-T049
+EXPECTED: Three fictional complete scenarios -> `PASS`; missing asset -> `FAIL`; next complete input -> `PASS`; unrelated tags -> `REVIEW`.
+ACTUAL CLI:
+FICTIONAL edge-fruit scenarios: STRUCTURE-ONLY, not correctness
+Altered edge model package: PASS
+Exposed fruit camera frame: PASS
+Offline classifier interruption: PASS
+missing_asset: FAIL (missing/blank: asset)
+next_valid_input: PASS (four fields supplied and matching author tag; human review still required)
+unrelated_control: REVIEW (threat/control topic tags differ; human review required)
+

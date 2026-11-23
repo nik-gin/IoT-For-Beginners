@@ -1,0 +1,8 @@
+TASK: R15-T046
+EXPECTED: Before and after both return `accepted=[A@1,A@2] rejected=[2:duplicate_device_timestamp,3:invalid_reading]` and `equal=true`.
+ACTUAL CLI:
+FICTIONAL sensor records — baseline versus extracted validate()
+before: accepted=[A@1,A@2] rejected=[2:duplicate_device_timestamp,3:invalid_reading]
+after:  accepted=[A@1,A@2] rejected=[2:duplicate_device_timestamp,3:invalid_reading]
+equal=true
+

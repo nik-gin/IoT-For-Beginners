@@ -1,0 +1,8 @@
+$ python3 1-getting-started/lessons/1-introduction-to-iot/applied-labs/r15-t044/example.py
+exit_code=0
+FICTIONAL IoT messages — deterministic local state trace
+step=1 accepted=1 rejected=0 keys=[('A', 2)]
+step=2 accepted=2 rejected=0 keys=[('A', 1), ('A', 2)]
+step=3 accepted=2 rejected=1 keys=[('A', 1), ('A', 2)]
+step=4 accepted=2 rejected=2 keys=[('A', 1), ('A', 2)]
+accepted=[A@1,A@2] rejected=[2:duplicate_device_timestamp,3:invalid_reading]

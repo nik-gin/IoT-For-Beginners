@@ -1,0 +1,10 @@
+TASK: R15-T047
+EXPECTED: Input `A@2`, `A@1`, duplicate `A@1`, invalid string reading -> accept, accept, reject, reject; sorted `A@1,A@2`.
+ACTUAL CLI:
+FICTIONAL fruit-device message records (not image classification)
+0: accept A@2
+1: accept A@1
+2: reject duplicate_device_timestamp
+3: reject invalid_reading
+sorted accepted=[A@1,A@2] rejected=[2:duplicate_device_timestamp,3:invalid_reading]
+

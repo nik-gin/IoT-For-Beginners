@@ -1,0 +1,24 @@
+RUN_INTENTIONAL_FAILURE=1
+$ python3 -m unittest discover -s 2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042 -p test_*.py
+exit_code=1
+F.....
+======================================================================
+FAIL: test_deliberately_wrong_result_fails (test_example.HysteresisTests.test_deliberately_wrong_result_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/R15-remaining-tasks/2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042/test_example.py", line 31, in test_deliberately_wrong_result_fails
+    self.assertEqual(simulate(READINGS), ["on", "on", "on", "on"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['off', 'on', 'on', 'off'] != ['on', 'on', 'on', 'on']
+
+First differing element 0:
+'off'
+'on'
+
+- ['off', 'on', 'on', 'off']
++ ['on', 'on', 'on', 'on']
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+FAILED (failures=1)

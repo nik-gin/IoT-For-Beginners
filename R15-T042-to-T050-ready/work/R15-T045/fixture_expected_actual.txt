@@ -1,0 +1,6 @@
+TASK: R15-T045
+EXPECTED: Local callable returns `A@2`, `A@1`, duplicate `A@1`, invalid reading; accepts sorted `A@1,A@2`, rejects the last two.
+ACTUAL CLI:
+FICTIONAL offline message-source adapter; NO speech service used
+accepted=[A@1,A@2] rejected=[2:duplicate_device_timestamp,3:invalid_reading]
+

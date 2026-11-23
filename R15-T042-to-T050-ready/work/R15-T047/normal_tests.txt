@@ -1,0 +1,7 @@
+$ python3 -m unittest discover -s 4-manufacturing/lessons/2-check-fruit-from-device/applied-labs/r15-t047 -p test_*.py
+exit_code=0
+.s.....
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+OK (skipped=1)

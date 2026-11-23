@@ -1,0 +1,4 @@
+$ python3 6-consumer/lessons/1-speech-recognition/applied-labs/r15-t045/example.py
+exit_code=0
+FICTIONAL offline message-source adapter; NO speech service used
+accepted=[A@1,A@2] rejected=[2:duplicate_device_timestamp,3:invalid_reading]

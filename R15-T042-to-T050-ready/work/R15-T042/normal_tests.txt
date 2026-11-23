@@ -1,0 +1,7 @@
+$ python3 -m unittest discover -s 2-farm/lessons/3-automated-plant-watering/applied-labs/r15-t042 -p test_*.py
+exit_code=0
+s.....
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK (skipped=1)

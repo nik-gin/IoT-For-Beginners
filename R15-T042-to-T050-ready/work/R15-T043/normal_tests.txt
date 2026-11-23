@@ -1,0 +1,7 @@
+$ python3 -m unittest discover -s 3-transport/lessons/4-geofences/applied-labs/r15-t043 -p test_*.py
+exit_code=0
+s....
+----------------------------------------------------------------------
+Ran 5 tests in 0.000s
+
+OK (skipped=1)
